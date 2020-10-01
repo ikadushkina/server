@@ -1,0 +1,39 @@
+version: "3.7"
+services:
+  db:
+    image: postgres:13.0
+    environment:
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_DB: "test"
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+    volumes:
+      - ./pg_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - net
+#db:5432
+  server:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: npm run dev
+    environment:
+      JWT_SECRET: "secret"
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./config:/usr/src/app/config
+      - ./migrations:/usr/src/app/migrations
+      - ./models:/usr/src/app/models
+      - ./seeders:/usr/src/app/seeders
+    ports:
+      - "8080:3000"
+    networks:
+      - net
+networks:
+  net:
+    driver: bridge
+
+
+#    127.0.0.1:5432
