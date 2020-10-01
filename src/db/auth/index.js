@@ -1,23 +1,17 @@
 const bcrypt = require('bcryptjs');
 const models = require('../../../models');
+const tokenjs = require('./token')
 const jwt = require("jsonwebtoken")
-const process = require("process");
 const {decode} = require("jsonwebtoken");
 
 async function checkExists(login) {
-        const user = await models.User.findOne({
+    return await models.User.findOne({
             where: {
                 login
             }
-        });
-        return !!user
+        })
 }
-async function verification(login, password){
-    const user = await models.User.findOne({
-        where: {
-            login: login
-        }
-    })
+async function verification(user, password){
     if (!user) {
         console.log("User undefined");
         return null;
@@ -31,40 +25,25 @@ async function verification(login, password){
     }
 }
 
-if (!process.env["JWT_SECRET"]) {
-    console.error("ENV 'JWT_SECRET' not exists");
-    return;
-}
-
-const jwtKey = process.env.JWT_SECRET;
-const jwtExpirySeconds = 30;
-
 async function loginUser(login, password, session){
-    const user = await models.User.findOne({
-        where: {
-            login
-        }
-    })
-    await verification(login, password).then(res => {
-        if (res) {
-            const token = jwt.sign({login, session}, jwtKey, {
-                algorithm: "HS256",
-                expiresIn: jwtExpirySeconds,
-            })
+    const user = await checkExists(login)
+    const isValid = await verification(user, password);
+    if (isValid) {
+        const token = await tokenjs.createToken(login, session)
+        const idUser = user.getDataValue('id');
+        const ttl = decode(token).exp
+        models.Session.create({
+            user_id: idUser,
+            session_id: session,
+            ttl
+        })
 
-            const idUser = user.getDataValue('id');
-            const ttl = decode(token).exp
-            models.Session.create({
-                 user_id: idUser,
-                 session_id: session,
-                 ttl
-            })
-        }
-    })
+    }
 }
+
 
 module.exports = {
     checkExists,
     verification,
-    loginUser,
+    loginUser
 }
