@@ -1,7 +1,8 @@
 const token = require("../token");
 
 const checkTokenMiddleware = (req, res, next) => {
-  if (req.path === "/auth/login" || "/auth/register") return next();
+  if (req.path === "/auth/login" || req.path === "/auth/register")
+    return next();
   if (!req.headers.authorization) {
     res.status(400).json({});
     return;

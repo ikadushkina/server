@@ -1,16 +1,15 @@
 const bcrypt = require("bcryptjs");
 const models = require("../../models");
 const tokenjs = require("../utils/token");
-const { decode } = require("jsonwebtoken");
 
-async function checkExists(login) {
+async function findUser(login) {
   return await models.User.findOne({
     where: {
       login,
     },
   });
 }
-async function verification(user, password) {
+async function isValidPassword(user, password) {
   if (!user) {
     console.log("User undefined");
     return null;
@@ -23,21 +22,25 @@ async function verification(user, password) {
   }
 }
 
+async function createSession(id, session, token) {
+  const ttl = tokenjs.decode(token).exp;
+  await models.Session.create({
+    user_id: id,
+    session_id: session,
+    ttl,
+  });
+}
+
 async function loginUser(login, password, session) {
-  const user = await checkExists(login);
-  const isValid = await verification(user, password);
+  const user = await findUser(login);
+  const isValid = await isValidPassword(user, password);
   const id = await user.getDataValue("id");
   console.log({ login, password, session, isValid });
 
   if (isValid) {
-    const token = await tokenjs.createToken(login, session, id);
-    const ttl = decode(token).exp;
-    await models.Session.create({
-      user_id: id,
-      session_id: session,
-      ttl,
-    });
-
+    const email = await user.getDataValue("email");
+    const token = await tokenjs.createToken(login, email, session, id);
+    await createSession(id, session, token);
     return token;
   }
   throw new Error("credentials is invalid");
@@ -53,33 +56,25 @@ async function logoutUser(userId, sessionId) {
 }
 
 async function registerUser(name, login, email, password, session) {
-  const oldUser = await checkExists(login);
+  const oldUser = await findUser(login);
   if (oldUser) {
     console.log("User exists");
-    return null;
-  } else {
-    const pass = bcrypt.hashSync(password, 10);
-    const user = await models.User.create({
-      name,
-      login,
-      email,
-      password: pass,
-    });
-    const id = await user.getDataValue("id");
-    const token = await tokenjs.createToken(login, email, session, id);
-    const ttl = decode(token).exp;
-    await models.Session.create({
-      user_id: id,
-      session_id: session,
-      ttl,
-    });
-    return token;
+    return;
   }
+  const pass = bcrypt.hashSync(password, 10);
+  const user = await models.User.create({
+    name,
+    login,
+    email,
+    password: pass,
+  });
+  const id = await user.getDataValue("id");
+  const token = await tokenjs.createToken(login, email, session, id);
+  await createSession(id, session, token);
+  return token;
 }
 
 module.exports = {
-  checkExists,
-  verification,
   loginUser,
   logoutUser,
   registerUser,
