@@ -18,6 +18,7 @@ const register = errorMiddlewareAsync(async (req, res) => {
   await db.auth.registerUser(
     "Marry Poppins",
     "marry",
+    "marry@ya.ru",
     "poppins",
     req.session.id
   );

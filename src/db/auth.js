@@ -52,7 +52,7 @@ async function logoutUser(userId, sessionId) {
   });
 }
 
-async function registerUser(name, login, password, session) {
+async function registerUser(name, login, email, password, session) {
   const oldUser = await checkExists(login);
   if (oldUser) {
     console.log("User exists");
@@ -62,10 +62,11 @@ async function registerUser(name, login, password, session) {
     const user = await models.User.create({
       name,
       login,
+      email,
       password: pass,
     });
     const id = await user.getDataValue("id");
-    const token = await tokenjs.createToken(login, session, id);
+    const token = await tokenjs.createToken(login, email, session, id);
     const ttl = decode(token).exp;
     await models.Session.create({
       user_id: id,
