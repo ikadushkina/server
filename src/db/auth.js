@@ -31,10 +31,9 @@ async function loginUser(login, password, session) {
 
   if (isValid) {
     const token = await tokenjs.createToken(login, session, id);
-    const idUser = user.getDataValue("id");
     const ttl = decode(token).exp;
     await models.Session.create({
-      user_id: idUser,
+      user_id: id,
       session_id: session,
       ttl,
     });
@@ -53,9 +52,34 @@ async function logoutUser(userId, sessionId) {
   });
 }
 
+async function registerUser(name, login, password, session) {
+  const oldUser = await checkExists(login);
+  if (oldUser) {
+    console.log("User exists");
+    return null;
+  } else {
+    const pass = bcrypt.hashSync(password, 10);
+    const user = await models.User.create({
+      name,
+      login,
+      password: pass,
+    });
+    const id = await user.getDataValue("id");
+    const token = await tokenjs.createToken(login, session, id);
+    const ttl = decode(token).exp;
+    await models.Session.create({
+      user_id: id,
+      session_id: session,
+      ttl,
+    });
+    return token;
+  }
+}
+
 module.exports = {
   checkExists,
   verification,
   loginUser,
   logoutUser,
+  registerUser,
 };

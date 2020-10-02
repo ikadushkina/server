@@ -14,7 +14,18 @@ const logout = errorMiddlewareAsync(async (req, res) => {
   res.json({});
 }, errors.failedCheckLoginOrPassword());
 
+const register = errorMiddlewareAsync(async (req, res) => {
+  await db.auth.registerUser(
+    "Marry Poppins",
+    "marry",
+    "poppins",
+    req.session.id
+  );
+  res.json({});
+}, errors.failedCheckLoginOrPassword());
+
 module.exports = {
   login,
   logout,
+  register,
 };
