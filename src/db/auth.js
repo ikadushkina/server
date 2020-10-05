@@ -11,16 +11,21 @@ async function findUser(login) {
 }
 async function isValidPassword(user, password) {
   if (!user) {
-    console.log("User undefined");
-    return null;
-  } else {
-    const pass = user.getDataValue("password");
-    const valid = bcrypt.compareSync(password, pass);
-    if (!valid) console.log("Wrong login or password");
-    else console.log(valid);
-    return valid;
+    throw new Error("User undefined");
   }
+  const pass = user.getDataValue("password");
+  const valid = bcrypt.compareSync(password, pass);
+  if (!valid) {
+    throw new Error("Wrong login or password");
+  }
+  return valid;
 }
+
+const log = (...args) => {
+  if (isDebug) {
+    console.log(...args);
+  }
+};
 
 async function createSession(id, session, token) {
   const ttl = tokenjs.decode(token).exp;
@@ -35,15 +40,12 @@ async function loginUser(login, password, session) {
   const user = await findUser(login);
   const isValid = await isValidPassword(user, password);
   const id = await user.getDataValue("id");
-  console.log({ login, password, session, isValid });
-
   if (isValid) {
-    const email = await user.getDataValue("email");
-    const token = await tokenjs.createToken(login, email, session, id);
+    const token = await tokenjs.createToken(login, session, id);
     await createSession(id, session, token);
     return token;
   }
-  throw new Error("credentials is invalid");
+  throw new Error("Credentials is invalid");
 }
 
 async function logoutUser(userId, sessionId) {
@@ -58,20 +60,16 @@ async function logoutUser(userId, sessionId) {
 async function registerUser(name, login, email, password, session) {
   const oldUser = await findUser(login);
   if (oldUser) {
-    console.log("User exists");
-    return;
+    throw new Error("User exists");
   }
   const pass = bcrypt.hashSync(password, 10);
-  const user = await models.User.create({
+  await models.User.create({
     name,
     login,
     email,
     password: pass,
   });
-  const id = await user.getDataValue("id");
-  const token = await tokenjs.createToken(login, email, session, id);
-  await createSession(id, session, token);
-  return token;
+  return await loginUser(login, password, session);
 }
 
 module.exports = {

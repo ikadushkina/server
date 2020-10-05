@@ -13,3 +13,7 @@
 ## Down
 
 `docker exec -it {container id} npm run db:migration:undo`
+
+## Seeder
+
+`sudo docker exec -it {container id} npm run db:seed:up`

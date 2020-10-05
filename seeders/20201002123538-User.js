@@ -24,7 +24,7 @@ const users = [
   },
   {
     name: "Test Yasha",
-    login: "Yasha",
+    login: "yasha",
     email: "testing_yasha@ya.ru",
     password: hashedPassword3,
     createdAt: new Date(),

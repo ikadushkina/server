@@ -1,7 +1,14 @@
 const token = require("../token");
 
-const checkTokenMiddleware = (req, res, next) => {
-  if (req.path === "/auth/login" || req.path === "/auth/register")
+const checkTokenMiddleware = (listExcludeNeedExistToken = []) => (
+  req,
+  res,
+  next
+) => {
+  if (
+    Array.isArray(listExcludeNeedExistToken) &&
+    listExcludeNeedExistToken.includes(req.path)
+  )
     return next();
   if (!req.headers.authorization) {
     res.status(400).json({});

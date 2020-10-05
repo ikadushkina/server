@@ -1,12 +1,8 @@
 const express = require("express");
-const process = require("process");
 const routes = require("./routes");
 const app = express();
 const session = require("express-session");
 const { checkTokenMiddleware } = require("./utils/middlewares/checkToken");
-
-console.log(process.env.JWT_SECRET);
-console.log(process.env.TTL_TOKEN);
 
 app.use(
   session({
@@ -16,7 +12,7 @@ app.use(
   })
 );
 
-app.use(checkTokenMiddleware);
+app.use(checkTokenMiddleware(["/auth/login", "/auth/register"]));
 app.use(routes);
 
 app.listen(3000);

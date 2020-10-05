@@ -21,7 +21,7 @@ services:
     command: npm run dev
     environment:
       JWT_SECRET: "very_very_secret"
-      TTL_TOKEN: 30
+      TTL_TOKEN: 300
       APP_PORT: 8000
     volumes:
       - ./src:/usr/src/app/src

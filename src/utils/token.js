@@ -1,8 +1,8 @@
 const jwt = require("jsonwebtoken");
 const { jwtKey, jwtExpirySeconds } = require("./env");
 
-function createToken(login, email, session, id) {
-  return jwt.sign({ login, email, session, id }, jwtKey, {
+function createToken(login, session, id) {
+  return jwt.sign({ login, session, id }, jwtKey, {
     algorithm: "HS256",
     expiresIn: jwtExpirySeconds,
   });

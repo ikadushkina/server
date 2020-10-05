@@ -3,26 +3,26 @@ const errors = require("../utils/errors");
 const { errorMiddlewareAsync } = require("../utils");
 
 const login = errorMiddlewareAsync(async (req, res) => {
-  const token = await db.auth.loginUser("Yasha", "yasha", req.session.id);
+  const token = await db.auth.loginUser("yasha", "yasha", req.session.id);
   console.log("LOGIN");
   res.json({ data: { token } });
 }, errors.failedCheckLoginOrPassword());
 
 const logout = errorMiddlewareAsync(async (req, res) => {
-  console.log("LOGOUT");
   await db.auth.logoutUser(req.jwtPayload.id, req.session.id);
+  console.log("LOGOUT");
   res.json({});
 }, errors.failedCheckLoginOrPassword());
 
 const register = errorMiddlewareAsync(async (req, res) => {
-  await db.auth.registerUser(
-    "Marry Poppins",
-    "marry",
-    "marry@ya.ru",
-    "poppins",
+  const token = await db.auth.registerUser(
+    "Darth Vader",
+    "darth",
+    "darth@ya.ru",
+    "vader",
     req.session.id
   );
-  res.json({});
+  res.json({ data: { token } });
 }, errors.failedCheckLoginOrPassword());
 
 module.exports = {
