@@ -13,11 +13,10 @@ async function addTag(tag_name) {
   if (oldTag) {
     console.log("Error: tag exists");
     return oldTag;
-  } else {
-    return await models.Tag.create({
-      tag_name,
-    });
   }
+  return await models.Tag.create({
+    tag_name,
+  });
 }
 
 module.exports = {

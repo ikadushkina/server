@@ -23,12 +23,11 @@ async function assTagToDoc(doc_id, tag_id) {
   if (old) {
     console.log("this doc/tag exists");
     return old;
-  } else {
-    return await models.DocTag.create({
-      doc_id,
-      tag_id,
-    });
   }
+  return await models.DocTag.create({
+    doc_id,
+    tag_id,
+  });
 }
 
 module.exports = {
