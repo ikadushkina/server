@@ -22,7 +22,7 @@ describe("TESTING DOC", () => {
   it("should add tag to doc", async () => {
     let token = utils.storage.get();
     const res = await request(app)
-      .post("/doc/add")
+      .post("/doc/addtag")
       .send()
       .set("Authorization", "Bearer " + token);
     expect(res.statusCode).toEqual(200);
