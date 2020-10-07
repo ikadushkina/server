@@ -33,6 +33,24 @@ services:
       - "8080:3000"
     networks:
       - net
+
+  tests:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    command: npm run test
+    environment:
+      JWT_SECRET: "very_very_secret"
+      TTL_TOKEN: 300
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./config:/usr/src/app/config
+      - ./__tests__:/usr/src/app/__tests__
+      - ./migrations:/usr/src/app/migrations
+      - ./models:/usr/src/app/models
+      - ./seeders:/usr/src/app/seeders
+    networks:
+      - net
 networks:
   net:
     driver: bridge

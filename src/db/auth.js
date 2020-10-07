@@ -57,7 +57,7 @@ async function logoutUser(userId, sessionId) {
   });
 }
 
-async function registerUser(name, login, email, password, session) {
+async function registerUser(name, login, email, password) {
   const oldUser = await findUser(login);
   if (oldUser) {
     throw new Error("User exists");
@@ -69,7 +69,6 @@ async function registerUser(name, login, email, password, session) {
     email,
     password: pass,
   });
-  return await loginUser(login, password, session);
 }
 
 module.exports = {
