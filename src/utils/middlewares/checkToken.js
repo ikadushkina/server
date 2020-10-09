@@ -21,9 +21,10 @@ const checkTokenMiddleware = (listExcludeNeedExistToken = []) => (
 
     req.jwtPayload = token.decode(jwtToken);
 
+    console.log("next");
     next();
   } catch (e) {
-    res.status(400).json({});
+    res.status(400).json({ data: { message: "error check token" } });
   }
 };
 

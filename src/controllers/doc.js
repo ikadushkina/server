@@ -13,7 +13,7 @@ const addDocument = errorMiddlewareAsync(async (req, res) => {
 }, errors.failedCheckLoginOrPassword());
 
 const addTagToDoc = errorMiddlewareAsync(async (req, res) => {
-  const doc = await db.doc.assTagToDoc(3, 1);
+  const doc = await db.doc.assTagToDoc(req.body.doc, req.body.tag);
   console.log("ADD DOC/TAG");
   res.json({ data: { doc } });
 }, errors.failedCheckLoginOrPassword());

@@ -17,13 +17,16 @@ const errorMiddlewareAsync = (cb, errorData) => (req, res) =>
       if (f instanceof Promise) {
         f.then(resolve).catch((err) => {
           printError(errorData, res, err);
+          console.log("REJECT", err);
           reject();
         });
       } else {
+        console.log("resolve");
         resolve();
       }
     } catch (err) {
       printError(errorData, res, err);
+      console.log("REJECT", err);
       reject();
     }
   });

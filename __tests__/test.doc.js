@@ -4,7 +4,10 @@ const utils = require("../src/utilsForTests");
 
 describe("TESTING DOC", () => {
   it("should login", async () => {
-    const res = await request(app).get("/auth/login").send();
+    const res = await request(app).post("/auth/login").send({
+      login: "yasha",
+      password: "yasha",
+    });
     expect(res.statusCode).toEqual(200);
     utils.storage.set(res.body.data.token);
   });
@@ -23,7 +26,10 @@ describe("TESTING DOC", () => {
     let token = utils.storage.get();
     const res = await request(app)
       .post("/doc/addtag")
-      .send()
+      .send({
+        doc: 5,
+        tag: 2,
+      })
       .set("Authorization", "Bearer " + token);
     expect(res.statusCode).toEqual(200);
   });
