@@ -5,8 +5,6 @@ if (!process.env["JWT_SECRET"]) {
 }
 
 const jwtKey = process.env.JWT_SECRET;
-const jwtExpirySeconds = process.env.TTL || 60;
-
-const port = process.env.APP_PORT || 3000;
+const jwtExpirySeconds = Number(process.env.JWT_TTL) || 600;
 
 module.exports = { jwtKey, jwtExpirySeconds };
